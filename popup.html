@@ -1,0 +1,47 @@
+<!-- popup.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>YouTube Pin</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+    button {
+      background-color: #ff0000;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    .header {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">YouTube Pin</div>
+  <div id="currentPage">
+    <div id="youtubeInfo"></div>
+    <button id="pinCurrent">Pin This Video</button>
+  </div>
+  <div id="manualEntry">
+    <p>Or manually enter a YouTube URL:</p>
+    <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=...">
+    <input type="text" id="videoTitle" placeholder="Video Title (optional)">
+    <button id="pinManual">Pin Video</button>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
