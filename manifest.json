@@ -5,8 +5,22 @@
   "description": "Pin favorite YouTube videos to your new tab page",
   "permissions": [
     "storage",
-    "tabs"
+    "tabs",
+    "scripting"
   ],
+  "host_permissions": [
+    "https://*.youtube.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://*.youtube.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -14,9 +28,6 @@
       "48": "images/icon48.png",
       "128": "images/icon128.png"
     }
-  },
-  "chrome_url_overrides": {
-    "newtab": "newtab.html"
   },
   "icons": {
     "16": "images/icon16.png",
