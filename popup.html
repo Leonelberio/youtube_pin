@@ -1,8 +1,8 @@
-<!-- popup.html -->
 <!DOCTYPE html>
 <html>
 <head>
   <title>YouTube Pin - Paramètres</title>
+    <meta charset="UTF-8">
   <style>
     body {
       width: 300px;
@@ -10,7 +10,6 @@
       font-family: Arial, sans-serif;
       color: #333;
     }
-    
     .header {
       display: flex;
       align-items: center;
@@ -18,60 +17,50 @@
       border-bottom: 1px solid #eee;
       padding-bottom: 10px;
     }
-    
     .header img {
       width: 24px;
       height: 24px;
       margin-right: 10px;
     }
-    
     .header h1 {
       margin: 0;
       font-size: 18px;
       font-weight: 500;
     }
-    
     .section {
       margin-bottom: 20px;
     }
-    
     .section-title {
       font-weight: 500;
       margin-bottom: 10px;
     }
-    
     .pin-count {
       background-color: #f8f8f8;
       padding: 10px;
       border-radius: 4px;
       margin-bottom: 15px;
     }
-    
     .pin-count-number {
       font-weight: bold;
       color: #c00;
     }
-    
     .option {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
     }
-    
     .toggle {
       position: relative;
       display: inline-block;
       width: 40px;
       height: 20px;
     }
-    
     .toggle input {
       opacity: 0;
       width: 0;
       height: 0;
     }
-    
     .slider {
       position: absolute;
       cursor: pointer;
@@ -83,7 +72,6 @@
       transition: .4s;
       border-radius: 34px;
     }
-    
     .slider:before {
       position: absolute;
       content: "";
@@ -95,19 +83,15 @@
       transition: .4s;
       border-radius: 50%;
     }
-    
     input:checked + .slider {
       background-color: #c00;
     }
-    
     input:checked + .slider:before {
       transform: translateX(20px);
     }
-    
     .categories {
       margin-top: 15px;
     }
-    
     .category-item {
       display: flex;
       justify-content: space-between;
@@ -115,20 +99,16 @@
       padding: 8px 0;
       border-bottom: 1px solid #eee;
     }
-    
     .category-name {
       font-weight: 500;
     }
-    
     .category-count {
       color: #666;
       font-size: 14px;
     }
-    
     .category-actions {
       display: flex;
     }
-    
     .category-actions button {
       background: none;
       border: none;
@@ -136,23 +116,19 @@
       color: #666;
       padding: 4px;
     }
-    
     .category-actions button:hover {
       color: #c00;
     }
-    
     .add-category {
       display: flex;
       margin-top: 10px;
     }
-    
     .add-category input {
       flex: 1;
       padding: 8px;
       border: 1px solid #ddd;
       border-radius: 4px 0 0 4px;
     }
-    
     .add-category button {
       background-color: #c00;
       color: white;
@@ -161,11 +137,9 @@
       padding: 0 10px;
       cursor: pointer;
     }
-    
     .add-category button:hover {
       background-color: #a00;
     }
-    
     .footer {
       font-size: 12px;
       color: #666;
@@ -174,18 +148,15 @@
       padding-top: 10px;
       border-top: 1px solid #eee;
     }
-    
     .footer a {
       color: #c00;
       text-decoration: none;
     }
-    
     .buttons {
       display: flex;
       justify-content: space-between;
       margin-top: 15px;
     }
-    
     .button {
       padding: 8px 12px;
       border: none;
@@ -193,12 +164,10 @@
       cursor: pointer;
       font-weight: 500;
     }
-    
     .primary {
       background-color: #c00;
       color: white;
     }
-    
     .secondary {
       background-color: #f8f8f8;
       color: #333;
@@ -210,18 +179,14 @@
     <img src="images/icon48.png" alt="YouTube Pin">
     <h1>YouTube Pin</h1>
   </div>
-  
   <div class="section">
     <div class="pin-count">
       <span id="pinnedCount">Chargement...</span>
     </div>
-    
     <a href="#" id="viewAllPins" class="button primary" style="display: block; text-align: center; text-decoration: none;">Voir toutes mes vidéos épinglées</a>
   </div>
-  
   <div class="section">
     <div class="section-title">Paramètres</div>
-    
     <div class="option">
       <span>Afficher en haut de la page d'accueil</span>
       <label class="toggle">
@@ -229,7 +194,6 @@
         <span class="slider"></span>
       </label>
     </div>
-    
     <div class="option">
       <span>Bouton "Pin" sur les miniatures</span>
       <label class="toggle">
@@ -237,7 +201,6 @@
         <span class="slider"></span>
       </label>
     </div>
-    
     <div class="option">
       <span>Bouton "Pin" sur le lecteur vidéo</span>
       <label class="toggle">
@@ -246,29 +209,22 @@
       </label>
     </div>
   </div>
-  
   <div class="section">
     <div class="section-title">Catégories</div>
-    <div id="categories" class="categories">
-      <!-- Les catégories seront chargées ici dynamiquement -->
-    </div>
-    
+    <div id="categories" class="categories"></div>
     <div class="add-category">
       <input type="text" id="newCategory" placeholder="Nouvelle catégorie">
       <button id="addCategory">+</button>
     </div>
   </div>
-  
   <div class="buttons">
     <button id="exportData" class="button secondary">Exporter</button>
     <button id="importData" class="button secondary">Importer</button>
     <button id="clearAll" class="button secondary">Tout effacer</button>
   </div>
-  
   <div class="footer">
     <p>Ajoutez vos vidéos YouTube préférées directement dans l'interface de YouTube.</p>
   </div>
-  
   <script src="popup.js"></script>
 </body>
 </html>

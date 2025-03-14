@@ -1,7 +1,6 @@
-// background.js
+// Initialize default categories on install
 chrome.runtime.onInstalled.addListener(() => {
-  // Initialize default categories if needed
-  chrome.storage.sync.get(['categories'], function(result) {
+  chrome.storage.sync.get(['categories'], function (result) {
     if (!result.categories) {
       const defaultCategories = [
         { id: 'default', name: 'Tous les pins' },
@@ -16,9 +15,10 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // Listen for messages from content script or popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  // Handle any background tasks here
   if (request.type === 'PIN_VIDEO') {
-    // Could be used for analytics or sync functionality in the future
+    // Placeholder for future analytics or sync functionality
     sendResponse({ status: 'success' });
+  } else if (request.action === 'showPinnedPage') {
+    sendResponse({ status: 'received' });
   }
 });

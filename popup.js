@@ -1,9 +1,6 @@
-// popup.js
-document.addEventListener('DOMContentLoaded', function() {
-  // Charger les données
+document.addEventListener('DOMContentLoaded', function () {
   loadData();
-  
-  // Ajouter les écouteurs d'événements
+
   document.getElementById('viewAllPins').addEventListener('click', openPinnedPage);
   document.getElementById('showOnHome').addEventListener('change', saveSettings);
   document.getElementById('showOnThumbnails').addEventListener('change', saveSettings);
@@ -12,10 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('exportData').addEventListener('click', exportData);
   document.getElementById('importData').addEventListener('click', importData);
   document.getElementById('clearAll').addEventListener('click', clearAllData);
-  
-  // Fonction pour charger les données
+
   function loadData() {
-    chrome.storage.sync.get(['pinnedVideos', 'categories', 'settings'], function(result) {
+    chrome.storage.sync.get(['pinnedVideos', 'categories', 'settings'], function (result) {
       const pinnedVideos = result.pinnedVideos || [];
       const categories = result.categories || [
         { id: 'default', name: 'Tous les pins' },
@@ -28,29 +24,21 @@ document.addEventListener('DOMContentLoaded', function() {
         showOnThumbnails: true,
         showOnPlayer: true
       };
-      
-      // Mettre à jour le compteur
+
       document.getElementById('pinnedCount').innerText = `${pinnedVideos.length} vidéo${pinnedVideos.length !== 1 ? 's' : ''} épinglée${pinnedVideos.length !== 1 ? 's' : ''}`;
-      
-      // Charger les paramètres
       document.getElementById('showOnHome').checked = settings.showOnHome;
       document.getElementById('showOnThumbnails').checked = settings.showOnThumbnails;
       document.getElementById('showOnPlayer').checked = settings.showOnPlayer;
-      
-      // Afficher les catégories
       displayCategories(categories, pinnedVideos);
     });
   }
-  
-  // Fonction pour afficher les catégories
+
   function displayCategories(categories, pinnedVideos) {
     const categoriesContainer = document.getElementById('categories');
     categoriesContainer.innerHTML = '';
-    
+
     categories.forEach(category => {
-      // Compter le nombre de vidéos dans cette catégorie
       const count = pinnedVideos.filter(video => (video.category || 'default') === category.id).length;
-      
       const categoryElement = document.createElement('div');
       categoryElement.className = 'category-item';
       categoryElement.innerHTML = `
@@ -73,180 +61,146 @@ document.addEventListener('DOMContentLoaded', function() {
           ` : ''}
         </div>
       `;
-      
       categoriesContainer.appendChild(categoryElement);
     });
-    
-    // Ajouter les écouteurs d'événements pour les boutons de catégorie
+
     document.querySelectorAll('.edit-category').forEach(button => {
-      button.addEventListener('click', function() {
+      button.addEventListener('click', function () {
         const categoryId = this.getAttribute('data-id');
         editCategory(categoryId, categories);
       });
     });
-    
+
     document.querySelectorAll('.delete-category').forEach(button => {
-      button.addEventListener('click', function() {
+      button.addEventListener('click', function () {
         const categoryId = this.getAttribute('data-id');
         deleteCategory(categoryId);
       });
     });
   }
-  
-  // Fonction pour ajouter une catégorie
+
   function addCategory() {
     const input = document.getElementById('newCategory');
     const categoryName = input.value.trim();
-    
     if (!categoryName) return;
-    
-    chrome.storage.sync.get(['categories'], function(result) {
+
+    chrome.storage.sync.get(['categories'], function (result) {
       const categories = result.categories || [
         { id: 'default', name: 'Tous les pins' },
         { id: 'watchlater', name: 'À regarder plus tard' },
         { id: 'favorites', name: 'Favoris' },
         { id: 'reference', name: 'Références' }
       ];
-      
-      // Créer une nouvelle catégorie
+
       const categoryId = 'category_' + Date.now();
       categories.push({ id: categoryId, name: categoryName });
-      
-      // Sauvegarder les catégories
-      chrome.storage.sync.set({ 'categories': categories }, function() {
-        // Actualiser l'affichage
+
+      chrome.storage.sync.set({ 'categories': categories }, function () {
         input.value = '';
         loadData();
       });
     });
   }
-  
-  // Fonction pour modifier une catégorie
+
   function editCategory(categoryId, categories) {
     const category = categories.find(cat => cat.id === categoryId);
     if (!category) return;
-    
+
     const newName = prompt('Modifier le nom de la catégorie:', category.name);
     if (!newName || newName === category.name) return;
-    
-    // Mettre à jour le nom de la catégorie
+
     const updatedCategories = categories.map(cat => {
       if (cat.id === categoryId) {
         return { ...cat, name: newName };
       }
       return cat;
     });
-    
-    // Sauvegarder les catégories
-    chrome.storage.sync.set({ 'categories': updatedCategories }, function() {
-      // Actualiser l'affichage
+
+    chrome.storage.sync.set({ 'categories': updatedCategories }, function () {
       loadData();
     });
   }
-  
-  // Fonction pour supprimer une catégorie
+
   function deleteCategory(categoryId) {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ? Les vidéos seront déplacées vers "Tous les pins".')) return;
-    
-    // Supprimer la catégorie et réaffecter les vidéos
-    chrome.storage.sync.get(['categories', 'pinnedVideos'], function(result) {
+
+    chrome.storage.sync.get(['categories', 'pinnedVideos'], function (result) {
       const categories = result.categories || [];
       const pinnedVideos = result.pinnedVideos || [];
-      
-      // Supprimer la catégorie
+
       const updatedCategories = categories.filter(cat => cat.id !== categoryId);
-      
-      // Réaffecter les vidéos à la catégorie par défaut
       const updatedVideos = pinnedVideos.map(video => {
         if ((video.category || 'default') === categoryId) {
           return { ...video, category: 'default' };
         }
         return video;
       });
-      
-      // Sauvegarder les données
+
       chrome.storage.sync.set({
         'categories': updatedCategories,
         'pinnedVideos': updatedVideos
-      }, function() {
-        // Actualiser l'affichage
+      }, function () {
         loadData();
       });
     });
   }
-  
-  // Fonction pour sauvegarder les paramètres
+
   function saveSettings() {
     const settings = {
       showOnHome: document.getElementById('showOnHome').checked,
       showOnThumbnails: document.getElementById('showOnThumbnails').checked,
       showOnPlayer: document.getElementById('showOnPlayer').checked
     };
-    
-    chrome.storage.sync.set({ 'settings': settings }, function() {
-      // Rafraîchir l'onglet actif pour appliquer les changements
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+
+    chrome.storage.sync.set({ 'settings': settings }, function () {
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         if (tabs[0].url.includes('youtube.com')) {
           chrome.tabs.reload(tabs[0].id);
         }
       });
     });
   }
-  
-  // Fonction pour exporter les données
+
   function exportData() {
-    chrome.storage.sync.get(['pinnedVideos', 'categories', 'settings'], function(result) {
+    chrome.storage.sync.get(['pinnedVideos', 'categories', 'settings'], function (result) {
       const data = JSON.stringify(result, null, 2);
-      
-      // Créer un lien de téléchargement
-      const blob = new Blob([data], {type: 'application/json'});
+      const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      
+
       const a = document.createElement('a');
       a.href = url;
       a.download = 'youtube_pin_backup_' + new Date().toISOString().split('T')[0] + '.json';
-      
-      // Déclencher le téléchargement
       document.body.appendChild(a);
       a.click();
-      
-      // Nettoyer
-      setTimeout(function() {
+
+      setTimeout(function () {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       }, 0);
     });
   }
-  
-  // Fonction pour importer des données
+
   function importData() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
-    input.onchange = function(e) {
+
+    input.onchange = function (e) {
       const file = e.target.files[0];
       if (!file) return;
-      
+
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         try {
           const data = JSON.parse(e.target.result);
-          
-          // Vérifier que les données sont valides
           if (!data.pinnedVideos && !data.categories && !data.settings) {
             throw new Error('Format de fichier invalide');
           }
-          
-          // Demander confirmation
           if (confirm('Êtes-vous sûr de vouloir importer ces données ? Cela remplacera vos données actuelles.')) {
-            // Importer les données
-            chrome.storage.sync.set(data, function() {
+            chrome.storage.sync.set(data, function () {
               alert('Données importées avec succès !');
               loadData();
-              
-              // Rafraîchir l'onglet actif pour appliquer les changements
-              chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+              chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                 if (tabs[0].url.includes('youtube.com')) {
                   chrome.tabs.reload(tabs[0].id);
                 }
@@ -257,22 +211,17 @@ document.addEventListener('DOMContentLoaded', function() {
           alert('Erreur lors de l\'importation : ' + error.message);
         }
       };
-      
       reader.readAsText(file);
     };
-    
     input.click();
   }
-  
-  // Fonction pour effacer toutes les données
+
   function clearAllData() {
     if (confirm('Êtes-vous sûr de vouloir supprimer toutes vos vidéos épinglées et catégories ? Cette action est irréversible.')) {
-      chrome.storage.sync.clear(function() {
+      chrome.storage.sync.clear(function () {
         alert('Toutes les données ont été effacées.');
         loadData();
-        
-        // Rafraîchir l'onglet actif pour appliquer les changements
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
           if (tabs[0].url.includes('youtube.com')) {
             chrome.tabs.reload(tabs[0].id);
           }
@@ -280,19 +229,15 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   }
-  
-  // Fonction pour ouvrir la page des pins
+
   function openPinnedPage() {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      // Si nous sommes sur YouTube, envoyer un message pour afficher la page des pins
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       if (tabs[0].url.includes('youtube.com')) {
         chrome.tabs.sendMessage(tabs[0].id, { action: 'showPinnedPage' });
         window.close();
       } else {
-        // Sinon, ouvrir YouTube dans un nouvel onglet
-        chrome.tabs.create({ url: 'https://www.youtube.com' }, function(tab) {
-          // Attendre que la page soit chargée pour afficher la page des pins
-          setTimeout(function() {
+        chrome.tabs.create({ url: 'https://www.youtube.com' }, function (tab) {
+          setTimeout(function () {
             chrome.tabs.sendMessage(tab.id, { action: 'showPinnedPage' });
           }, 3000);
         });

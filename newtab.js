@@ -1,11 +1,9 @@
-// newtab.js
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const videosContainer = document.getElementById('videosContainer');
-  
-  // Load pinned videos from storage
-  chrome.storage.sync.get(['pinnedVideos'], function(result) {
+
+  chrome.storage.sync.get(['pinnedVideos'], function (result) {
     const pinnedVideos = result.pinnedVideos || [];
-    
+
     if (pinnedVideos.length === 0) {
       videosContainer.innerHTML = `
         <div class="empty-state">
@@ -15,11 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
       `;
       return;
     }
-    
-    // Sort videos by timestamp (newest first)
+
     pinnedVideos.sort((a, b) => b.timestamp - a.timestamp);
-    
-    // Render videos
+
     pinnedVideos.forEach(video => {
       const videoCard = document.createElement('div');
       videoCard.className = 'video-card';
@@ -35,32 +31,26 @@ document.addEventListener('DOMContentLoaded', function() {
       `;
       videosContainer.appendChild(videoCard);
     });
-    
-    // Add event listeners to buttons
+
     document.querySelectorAll('.btn-watch').forEach(button => {
-      button.addEventListener('click', function() {
+      button.addEventListener('click', function () {
         window.location.href = this.getAttribute('data-url');
       });
     });
-    
+
     document.querySelectorAll('.btn-remove').forEach(button => {
-      button.addEventListener('click', function() {
+      button.addEventListener('click', function () {
         const videoId = this.getAttribute('data-id');
         removeVideo(videoId);
       });
     });
   });
-  
+
   function removeVideo(videoId) {
-    chrome.storage.sync.get(['pinnedVideos'], function(result) {
+    chrome.storage.sync.get(['pinnedVideos'], function (result) {
       let pinnedVideos = result.pinnedVideos || [];
-      
-      // Filter out the video to remove
       pinnedVideos = pinnedVideos.filter(video => video.id !== videoId);
-      
-      // Save updated list
-      chrome.storage.sync.set({ 'pinnedVideos': pinnedVideos }, function() {
-        // Refresh the page to update the display
+      chrome.storage.sync.set({ 'pinnedVideos': pinnedVideos }, function () {
         location.reload();
       });
     });
