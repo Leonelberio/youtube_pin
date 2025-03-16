@@ -300,7 +300,7 @@
           </svg>
         </button>
         <div class="pinned-video-grid">
-          ${pinnedVideos.slice(0, 6).map(video => `
+          ${pinnedVideos.map(video => `
             <div class="pinned-video-card" data-video-id="${video.id}">
               <a href="${video.url}" class="thumbnail-container">
                 <img src="https://i.ytimg.com/vi/${video.id}/mqdefault.jpg" alt="${video.title}">
@@ -446,14 +446,74 @@
           category: 'default'
         };
 
+        // Add to storage
         pinnedVideos.unshift(newVideo);
-
         chrome.storage.sync.set({ 'pinnedVideos': pinnedVideos }, function () {
           showToast('Vidéo épinglée ✅');
-          if (window.location.pathname === '/' || window.location.pathname === '/feed/subscriptions') {
-            addPinnedSection(pinnedVideos);
-          }
         });
+
+        // Update UI in real time
+        if (window.location.pathname === '/' || window.location.pathname === '/feed/subscriptions') {
+          const existingSection = document.getElementById('pinned-videos-section');
+          if (!existingSection) {
+            addPinnedSection(pinnedVideos);
+            const addedCard = document.querySelector(`.pinned-video-card[data-video-id="${videoId}"]`);
+            if (addedCard) {
+              addedCard.classList.add('new');
+              setTimeout(() => addedCard.classList.remove('new'), 300);
+            }
+          } else {
+            const grid = existingSection.querySelector('.pinned-video-grid');
+            if (grid) {
+              const videoCard = document.createElement('div');
+              videoCard.className = 'pinned-video-card new';
+              videoCard.dataset.videoId = videoId;
+              videoCard.innerHTML = `
+                <a href="${url}" class="thumbnail-container">
+                  <img src="https://i.ytimg.com/vi/${videoId}/mqdefault.jpg" alt="${title}">
+                </a>
+                <button class="remove-pin" data-video-id="${videoId}">
+                  <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <div class="video-info">
+                  <a href="${url}" class="video-title">${title}</a>
+                  <div class="video-category">Non classé</div>
+                </div>
+              `;
+
+              videoCard.querySelector('.remove-pin').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                unpinVideo(videoId);
+              });
+
+              if (grid.firstChild) {
+                grid.insertBefore(videoCard, grid.firstChild);
+              } else {
+                grid.appendChild(videoCard);
+              }
+
+              // Remove excess cards
+              const cards = grid.querySelectorAll('.pinned-video-card');
+              if (cards.length > 6) {
+                const lastCard = cards[cards.length - 1];
+                lastCard.style.opacity = '0';
+                lastCard.style.transform = 'translateY(20px)';
+                setTimeout(() => lastCard.remove(), 300);
+              }
+
+              // Update view all link count
+              const viewAllLink = existingSection.querySelector('#view-all-pins');
+              if (viewAllLink) {
+                viewAllLink.textContent = `Voir toutes vos vidéos épinglées (${pinnedVideos.length})`;
+              }
+
+              setTimeout(() => videoCard.classList.remove('new'), 300);
+            }
+          }
+        }
       });
     } else {
       console.warn('[YouTube Pin] Storage not available, pinning skipped.');
@@ -577,29 +637,22 @@
               ` : `
                 <div id="pinned-videos-container" class="grid-view">
                   ${pinnedVideos.map(video => `
-                    <div class="pinned-video-item" data-id="${video.id}" data-category="${video.category || 'default'}" draggable="true">
-                      <a href="${video.url}" class="thumbnail-container">
-                        <img src="https://i.ytimg.com/vi/${video.id}/mqdefault.jpg" alt="${video.title}">
-                      </a>
-                      <div class="video-details">
-                        <a href="${video.url}" class="video-title">${video.title}</a>
-                        <div class="video-category">${video.category || 'Non classé'}</div>
-                        <div class="video-actions">
-                          <button class="category-select" data-id="${video.id}">
-                            <svg viewBox="0 0 24 24" width="16" height="16">
-                              <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" fill="currentColor"/>
-                            </svg>
-                            Catégorie
-                          </button>
-                          <button class="remove-pin" data-id="${video.id}">
-                            <svg viewBox="0 0 24 24" width="16" height="16">
-                              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="currentColor"/>
-                            </svg>
-                            Supprimer
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                     <div class="pinned-video-card" data-video-id="${video.id}">
+              <a href="${video.url}" class="thumbnail-container">
+                <img src="https://i.ytimg.com/vi/${video.id}/mqdefault.jpg" alt="${video.title}">
+              </a>
+              <button class="remove-pin" data-video-id="${video.id}">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                  <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="currentColor"/>
+                </svg>
+              </button>
+              <div class="video-info">
+                <a href="${video.url}" class="video-title">${video.title}</a>
+                <div class="video-category">
+                  ${video.category || 'Non classé'}
+                </div>
+              </div>
+            </div>
                   `).join('')}
                 </div>
               `}
