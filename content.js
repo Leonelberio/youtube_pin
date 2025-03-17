@@ -477,6 +477,9 @@
                 <path d="M3,4H21V8H3V4M3,10H21V14H3V10M3,16H21V20H3V16Z" fill="currentColor"/>
               </svg>
             </button>
+             <button id="back-to-youtube" class="back-button">
+          Retour à YouTube
+        </button>
           </div>
         </div>
         <div class="categories-nav">
@@ -499,9 +502,7 @@
         <div class="pinned-content ${pinnedVideos.length === 0 ? 'empty' : ''}">
           ${pinnedVideos.length === 0 ? generateEmptyState() : generateVideoGrid(pinnedVideos)}
         </div>
-        <button id="back-to-youtube" class="back-button">
-          Retour à YouTube
-        </button>
+       
       </div>
     `;
   }
@@ -711,4 +712,15 @@
   } else {
     initializeExtension();
   }
+
+  // Add message listener for popup actions
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('[YouTube Pin] Received message:', request);
+    if (request.action === 'showPinnedPage') {
+      console.log('[YouTube Pin] Showing pinned page from popup');
+      showPinnedPage();
+      sendResponse({ status: 'success' });
+    }
+    return true;
+  });
 })();
