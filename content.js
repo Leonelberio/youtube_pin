@@ -106,6 +106,15 @@
         </svg>
       `;
 
+      // Check if video is pinned
+      chrome.storage.sync.get(['pinnedVideos'], function(result) {
+        const pinnedVideos = result.pinnedVideos || [];
+        const video = pinnedVideos.find(v => v.id === videoId);
+        if (video) {
+          pinButton.classList.add('active');
+        }
+      });
+
       pinButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -375,7 +384,44 @@
     }
   }
 
-  function unpinVideo(videoId) {
+    function refreshPinnedSection(pinnedVideos, newVideo) {
+      const grid = document.querySelector('.pinned-video-grid');
+      if (!grid) return;
+      
+      const videoCard = document.createElement('div');
+      videoCard.className = 'pinned-video-card new';
+      videoCard.dataset.videoId = newVideo.id;
+      videoCard.dataset.category = newVideo.category || 'default';
+      videoCard.innerHTML = `
+        <a href="${newVideo.url}" class="thumbnail-container">
+          <img src="https://i.ytimg.com/vi/${newVideo.id}/mqdefault.jpg" alt="${newVideo.title}">
+        </a>
+        <button class="remove-pin" data-video-id="${newVideo.id}">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="currentColor"/>
+          </svg>
+        </button>
+        <div class="video-info">
+          <a href="${newVideo.url}" class="video-title">${newVideo.title}</a>
+          <div class="video-category">${newVideo.category || 'Non classé'}</div>
+        </div>
+      `;
+      
+      // Add new video card at the beginning
+      grid.insertBefore(videoCard, grid.firstChild);
+      
+      // Setup event listeners for the new card
+      const removeButton = videoCard.querySelector('.remove-pin');
+      if (removeButton) {
+        removeButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          unpinVideo(newVideo.id);
+        });
+      }
+    }
+
+    function unpinVideo(videoId) {
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
       chrome.storage.sync.get(['pinnedVideos'], function (result) {
         let pinnedVideos = result.pinnedVideos || [];

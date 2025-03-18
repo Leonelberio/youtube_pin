@@ -35,8 +35,16 @@
   opacity: 1;
 }
 
+.pin-button.active {
+  background-color: #ff0000;
+}
+
 .pin-button:hover {
   background-color: rgba(255, 0, 0, 0.8);
+}
+
+.pin-button.active:hover {
+  background-color: rgba(255, 0, 0, 0.6);
 }
 
 .pin-button svg {
