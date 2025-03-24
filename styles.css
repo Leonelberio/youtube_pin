@@ -537,6 +537,66 @@
   background-color: var(--hover-bg);
 }
 
+/* Focus Mode */
+.focus-mode-button {
+  position: absolute;
+  top: 8px;
+  right: 48px; /* Position it next to the pin button */
+  width: 32px;
+  height: 32px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.html5-video-player:hover .focus-mode-button {
+  opacity: 1;
+}
+
+.focus-mode-button.active {
+  background-color: #1a73e8;
+}
+
+.focus-mode-button:hover {
+  background-color: rgba(26, 115, 232, 0.8);
+}
+
+.focus-mode-button.active:hover {
+  background-color: rgba(26, 115, 232, 0.6);
+}
+
+.focus-mode-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Hide elements in focus mode */
+body[focus-mode="true"] #related,
+body[focus-mode="true"] #comments,
+body[focus-mode="true"] #meta,
+body[focus-mode="true"] #endscreen,
+body[focus-mode="true"] #items.ytd-watch-next-secondary-results-renderer {
+  display: none !important;
+}
+
+body[focus-mode="true"] #player {
+  max-width: 90vw !important;
+  margin: 0 auto !important;
+}
+
+/* Transition for focus mode */
+#player {
+  transition: max-width 0.3s ease-in-out;
+}
+
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
   :root {

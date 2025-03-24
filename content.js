@@ -8,6 +8,7 @@
 
   let autoPinChannels = [];
   let floatingPlayer = null;
+  let isFocusMode = false;
 
   // Initialize the extension
   function initializeExtension() {
@@ -19,7 +20,7 @@
     }
 
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
-      chrome.storage.sync.get(['pinnedVideos', 'categories', 'autoPinChannels', 'settings'], function (result) {
+      chrome.storage.sync.get(['pinnedVideos', 'categories', 'autoPinChannels', 'settings', 'focusMode'], function (result) {
         const pinnedVideos = result.pinnedVideos || [];
         const categories = result.categories || defaultCategories;
         autoPinChannels = result.autoPinChannels || [];
@@ -28,8 +29,12 @@
           showOnThumbnails: true,
           showOnPlayer: true
         };
+        isFocusMode = result.focusMode || false;
 
         setTimeout(() => {
+          if (isFocusMode && window.location.pathname.includes('/watch')) {
+            document.body.setAttribute('focus-mode', 'true');
+          }
           setupUI(settings, pinnedVideos);
           observePageChanges();
         }, 1500);
@@ -48,6 +53,7 @@
     if (window.location.pathname.includes('/watch')) {
       if (settings.showOnPlayer) addPinButtonToPlayer();
       addFloatingPlayerButton();
+      addFocusModeButton();
     }
     if (window.location.pathname.includes('/channel/') ||
         window.location.pathname.includes('/c/') ||
@@ -128,6 +134,60 @@
       }
 
       checkAndAutoPinVideo(videoElement);
+    });
+  }
+
+  function addFocusModeButton() {
+    const player = document.querySelector('.html5-video-player');
+    if (!player || player.querySelector('.focus-mode-button')) return;
+
+    // Create focus mode button
+    const focusModeButton = document.createElement('button');
+    focusModeButton.className = 'focus-mode-button';
+    focusModeButton.innerHTML = `
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.79-13.29a.996.996 0 0 0-1.41 0L12 9.09 9.62 6.71a.996.996 0 1 0-1.41 1.41L10.59 10.5 8.21 12.88a.996.996 0 1 0 1.41 1.41L12 11.91l2.38 2.38a.996.996 0 1 0 1.41-1.41L13.41 10.5l2.38-2.38c.39-.39.39-1.02 0-1.41z" fill="currentColor"/>
+      </svg>
+    `;
+
+    // Get saved focus mode state
+    chrome.storage.sync.get(['focusMode'], function(result) {
+      isFocusMode = result.focusMode || false;
+      if (isFocusMode) {
+        focusModeButton.classList.add('active');
+        document.body.setAttribute('focus-mode', 'true');
+      }
+    });
+
+    // Add click event listener
+    focusModeButton.addEventListener('click', toggleFocusMode);
+
+    // Add button to player controls
+    const controls = player.querySelector('.ytp-right-controls');
+    if (controls) {
+      controls.prepend(focusModeButton);
+    }
+  }
+
+  function toggleFocusMode() {
+    isFocusMode = !isFocusMode;
+    
+    // Update button state
+    const focusModeButton = document.querySelector('.focus-mode-button');
+    if (focusModeButton) {
+      if (isFocusMode) {
+        focusModeButton.classList.add('active');
+      } else {
+        focusModeButton.classList.remove('active');
+      }
+    }
+
+    // Update body attribute to trigger CSS changes
+    document.body.setAttribute('focus-mode', isFocusMode);
+
+    // Save state
+    chrome.storage.sync.set({ focusMode: isFocusMode }, function() {
+      showToast(isFocusMode ? 'Focus mode activé' : 'Focus mode désactivé');
     });
   }
 
@@ -685,9 +745,10 @@
       if (lastUrl !== window.location.href) {
         lastUrl = window.location.href;
         if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
-          chrome.storage.sync.get(['pinnedVideos', 'settings'], function (result) {
+          chrome.storage.sync.get(['pinnedVideos', 'settings', 'focusMode'], function (result) {
             const pinnedVideos = result.pinnedVideos || [];
             const settings = result.settings || { showOnHome: true, showOnThumbnails: true, showOnPlayer: true };
+            const focusMode = result.focusMode || false;
 
             if (window.location.pathname === '/' || window.location.pathname === '/feed/subscriptions') {
               if (settings.showOnHome) addPinnedSection(pinnedVideos);
@@ -695,6 +756,11 @@
             if (window.location.pathname.includes('/watch')) {
               if (settings.showOnPlayer) addPinButtonToPlayer();
               addFloatingPlayerButton();
+              addFocusModeButton();
+              // Restore focus mode state
+              if (focusMode) {
+                document.body.setAttribute('focus-mode', 'true');
+              }
             }
             if (settings.showOnThumbnails) setupPinButtons();
           });
