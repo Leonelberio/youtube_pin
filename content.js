@@ -7,10 +7,8 @@
   ];
 
   let autoPinChannels = [];
-  let floatingPlayer = null;
   let isFocusMode = false;
 
-  // Initialize the extension
   function initializeExtension() {
     console.log('[YouTube Pin] Initializing extension...');
 
@@ -52,7 +50,6 @@
     }
     if (window.location.pathname.includes('/watch')) {
       if (settings.showOnPlayer) addPinButtonToPlayer();
-      addFloatingPlayerButton();
       addFocusModeButton();
     }
     if (window.location.pathname.includes('/channel/') ||
@@ -214,81 +211,6 @@
     }
   }
 
-  function addFloatingPlayerButton() {
-    const player = document.querySelector('.html5-video-player');
-    if (!player || player.querySelector('.floating-player-button')) return;
-
-    const button = document.createElement('button');
-    button.className = 'floating-player-button';
-    button.innerHTML = `
-      <svg viewBox="0 0 24 24" width="24" height="24">
-        <path d="M21,3H3C1.89,3 1,3.89 1,5V19C1,20.11 1.89,21 3,21H21C22.11,21 23,20.11 23,19V5C23,3.89 22.11,3 21,3M21,19H3V5H21V19Z" fill="currentColor"/>
-      </svg>
-    `;
-    button.addEventListener('click', toggleFloatingPlayer);
-
-    const controls = player.querySelector('.ytp-right-controls');
-    if (controls) {
-      controls.prepend(button);
-    }
-  }
-
-  function toggleFloatingPlayer() {
-    if (floatingPlayer) {
-      floatingPlayer.remove();
-      floatingPlayer = null;
-      return;
-    }
-
-    const video = document.querySelector('video');
-    if (!video) return;
-
-    floatingPlayer = document.createElement('div');
-    floatingPlayer.className = 'floating-player';
-    floatingPlayer.innerHTML = `
-      <div class="floating-player-header">
-        <span class="floating-player-title">${document.querySelector('#title h1')?.textContent || 'Vidéo'}</span>
-        <button class="floating-player-close">×</button>
-      </div>
-      <video src="${video.src}" controls autoplay></video>
-    `;
-    document.body.appendChild(floatingPlayer);
-
-    floatingPlayer.querySelector('.floating-player-close').addEventListener('click', () => toggleFloatingPlayer());
-    makeDraggable(floatingPlayer);
-  }
-
-  function makeDraggable(el) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    const header = el.querySelector('.floating-player-header');
-    
-    if (header) {
-      header.addEventListener('mousedown', dragMouseDown);
-    }
-
-    function dragMouseDown(e) {
-      e.preventDefault();
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      document.addEventListener('mousemove', elementDrag);
-      document.addEventListener('mouseup', closeDragElement);
-    }
-
-    function elementDrag(e) {
-      e.preventDefault();
-      pos1 = pos3 - e.clientX;
-      pos2 = pos4 - e.clientY;
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      el.style.top = (el.offsetTop - pos2) + 'px';
-      el.style.left = (el.offsetLeft - pos1) + 'px';
-    }
-
-    function closeDragElement() {
-      document.removeEventListener('mousemove', elementDrag);
-      document.removeEventListener('mouseup', closeDragElement);
-    }
-  }
 
   function addPinnedSection(pinnedVideos) {
     if (pinnedVideos.length === 0) return;
@@ -755,7 +677,6 @@
             }
             if (window.location.pathname.includes('/watch')) {
               if (settings.showOnPlayer) addPinButtonToPlayer();
-              addFloatingPlayerButton();
               addFocusModeButton();
               // Restore focus mode state
               if (focusMode) {

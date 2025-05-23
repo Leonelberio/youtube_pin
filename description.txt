@@ -1,0 +1,12 @@
+Notre extension pour YouTube vous permet d'épingler vos vidéos préférées directement sur YouTube, de les organiser par catégories personnalisées, et d'exporter/importer vos données d'épingles pour une sauvegarde sécurisée.
+
+Avantages pour les utilisateurs
+- Épinglage intelligent : Gardez vos vidéos préférées accessibles en un clic, sans devoir les rechercher à chaque fois.
+
+- Organisation par catégories : Créez vos propres playlists thématiques (musique, apprentissage, détente…) et classez vos vidéos comme bon vous semble.
+
+- Sauvegarde et portabilité : Exportez et importez vos données d'épingles pour conserver votre collection de vidéos sur différents appareils.
+
+- Gain de temps : Fini les onglets ouverts en pagaille ou les recherches répétées.
+
+- Expérience YouTube personnalisée : Transformez YouTube en votre centre de contenu personnel et intelligent.
