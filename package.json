@@ -1,0 +1,33 @@
+{
+  "name": "youtube-pin",
+  "version": "1.0.0",
+  "description": "Pin favorite YouTube videos directly on YouTube with custom categories and data export/import functionality",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"No build step yet\" && exit 0",
+    "lint": "eslint src/",
+    "format": "prettier --write \"src/**/*.{js,css,html}\"",
+    "zip": "zip -r youtube-pin.zip src/ manifest.json LICENSE README.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Leonelberio/youtube_pin.git"
+  },
+  "keywords": [
+    "chrome-extension",
+    "youtube",
+    "bookmarks",
+    "video-management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Leonelberio/youtube_pin/issues"
+  },
+  "homepage": "https://github.com/Leonelberio/youtube_pin#readme",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^2.0.0"
+  }
+}
