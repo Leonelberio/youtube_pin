@@ -14,7 +14,7 @@
 .pin-button {
   position: absolute;
   top: 8px;
-  right: 8px;
+  left: 8px;
   width: 32px;
   height: 32px;
   background-color: rgba(0, 0, 0, 0.6);
